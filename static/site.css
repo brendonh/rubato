@@ -1,0 +1,171 @@
+img { border: 0; }
+
+body {
+  background-color: rgb(161, 0, 61);
+  color: #eee;
+}
+
+#main {
+  width: 700px;
+  margin: 10px auto 10px auto;
+  padding: 10px;
+  border: 1px dotted rgb(255, 240, 62);
+  font-family: Sans;
+  background-color: rgb(99, 0, 36);
+}
+
+.mainTitle {
+  font-size: 1.5em;
+}
+
+
+a { text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+#session {
+  float: right;
+  color: rgb(255, 240, 62);
+  font-size: 12px;
+}
+
+#session .loggedin {
+  padding: 10px 20px;
+}
+
+#session a {
+  color: rgb(255, 186, 20);
+}
+
+#session input[type=text], #session input[type=password] {
+  border: 0;
+  background-color: rgb(219, 58, 15);
+  margin: 2px;
+}
+
+#session input[type=submit] {
+  border: 0;
+  margin: 2px;
+  background-color: rgb(255, 240, 62);
+  color: black;
+  font-size: 14px;
+}
+
+#session input[type=submit]:hover {
+  border: 1px solid black;
+}
+
+
+#nav {
+  display: none;
+  margin: 10px 0;
+}
+
+#nav div {
+  float: left;
+}
+
+#nav h1 {
+  padding: 5px 10px;
+  border-right: 1px solid rgb(99, 0, 36);
+  background-color: rgb(255, 240, 62);
+  cursor: pointer;
+}
+
+#nav h1, #nav h1 a {
+  color: rgb(99, 0, 36);
+}
+
+#nav a {
+  color: #d41e00;
+}
+
+#nav ul {
+  position: absolute;
+  display: none;
+  background-color: #eee;
+}
+
+#nav li {
+  padding: 5px;
+  border: 0;
+}
+
+.subTitle {
+  clear: both;
+  padding: 10px 0;
+  font-size: 1.2em;
+}
+
+.tableList {
+  width: 250px;
+  border: 1px dotted #ccc;
+  border-bottom: 0;
+  padding: 0;
+  margin-left: 20px;
+} 
+
+.tableScroll {
+  width: 920px;
+  margin: 20px;
+  overflow-x: auto;
+}
+
+.dbTable  {
+  border-collapse: collapse;
+}
+
+.dbTable td, .dbTable th {
+  padding: 5px;
+  border-left: 1px dotted black;
+}
+
+.dbTable td.first, .dbTable th.first {
+  border-left: 0;
+}
+
+.dbTable th {
+  background-color: #ddf;
+  border-bottom: 1px solid black;
+}
+
+li {
+  list-style-type: none;
+  border-bottom: 1px dotted #ccc;  
+  padding: 3px;
+}
+
+.tableList li.odd, .dbTable tr.odd {
+  background-color: #eef;
+}
+
+.tableList a {
+  text-decoration: none;
+}
+
+.tableList a:hover {
+  text-decoration: underline;
+}
+
+.null {
+  color: #f00;
+}
+
+.number {
+  color: #00f;
+  text-align: right;
+}
+
+.pageLinks {
+  color: #999;
+  margin-left: 20px;
+  font-size: 0.8em;
+}
+
+.pageLinks a, .pageLinks a:visited {
+  text-decoration: none;
+  color: blue;
+}
+
+.pageLinks a:hover {
+  text-decoration: underline;
+}

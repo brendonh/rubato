@@ -1,0 +1,15 @@
+<e:inv>
+<e:inv e:render="items" e:key="nav">
+<div>
+  <h1 e:render="data" e:key="key" />
+  <ul e:render="items" e:key="value">
+    <li>
+      <a><e:attr name="href" e:render="data" e:key="value" /><e:slot key="key" /></a>
+    </li>
+  </ul>
+</div>
+</e:inv>
+<script type="text/javascript">
+configure_menus("#nav");
+</script>
+</e:inv>
