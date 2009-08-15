@@ -16,7 +16,7 @@ TARGETS  = $(patsubst $(SRC_DIR)/%.erl, $(EBIN_DIR)/%.beam,$(SOURCES))
 
 SHARED_INCLUDE = ../shared/$(INCLUDE_DIR)
 SHARED_EBIN = ../shared/$(EBIN_DIR)
-EVO_INCLUDE = ../Evo/src
+EVO_INCLUDE = ../evo/evo/src
 
 ERLC_INCLUDES = -I $(INCLUDE_DIR) -I $(SHARED_INCLUDE) -I $(EVO_INCLUDE)
 ERL_EBINS = -pa $(EBIN_DIR) -pa $(EVO_EBIN) -pa $(ID3_EBIN) \
@@ -40,6 +40,9 @@ run: run_prereqs
 
 setup: run_prereqs
 	$(ERL_CMD) -s rubato_app setup -s init stop
+
+test: run_prereqs
+	$(ERL_CMD) -s ${APP_NAME}_app go -s rubato_lib test -s init stop
 
 stop:
 	erl_call -a '$(APP_NAME)_app stop_and_halt []' -sname $(PKG_NAME)

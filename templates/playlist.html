@@ -1,0 +1,21 @@
+<div>
+
+  <link rel="stylesheet" href="/static/playlist.css" type="text/css"></link>
+  <script src="/static/playlist.js"></script>
+
+  <script type="text/javascript">
+  $(document).ready(playlist_setup);
+  </script>
+
+  <div class="listContainer" id="library">
+    Loading...
+  </div>
+  
+  <div id="folderTemplate">
+    <div class="folder">
+      [+] <span class="artist" j:slot="artist"></span> (<span j:slot="total"></span>)
+    </div>
+  </div>
+
+</div>
+

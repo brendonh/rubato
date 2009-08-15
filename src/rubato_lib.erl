@@ -10,7 +10,7 @@
 -behaviour(gen_server).
 
 %% API
--export([start_link/0]).
+-export([start_link/0, test/0]).
 
 %% gen_server callbacks
 -export([init/1, handle_call/3, handle_cast/2, handle_info/2,
@@ -23,12 +23,13 @@
 %%====================================================================
 %% API
 %%====================================================================
-%%--------------------------------------------------------------------
-%% Function: start_link() -> {ok,Pid} | ignore | {error,Error}
-%% Description: Starts the server
-%%--------------------------------------------------------------------
+
 start_link() ->
     gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+test() ->
+    gen_server:cast(?MODULE, rescan),
+    ?DBG(gen_server:call(?MODULE, artistSummary)).
 
 %%====================================================================
 %% gen_server callbacks
@@ -45,9 +46,13 @@ init([]) ->
     end.
 
 
-handle_call(_Request, _From, State) ->
-    Reply = ok,
-    {reply, Reply, State}.
+
+handle_call(artistSummary, _From, State) ->
+    {reply, artist_summary(), State};
+
+handle_call(Request, _From, State) ->
+    ?DBG({unknown_call, Request}),
+    {reply, ok, State}.
 
 
 
@@ -78,6 +83,7 @@ code_change(_OldVsn, State, _Extra) ->
 
 rescan() ->
     {ok, Patterns} = application:get_env(lib_patterns),
+    mnesia:clear_table(track),
     ?DBG(mnesia:transaction(fun() -> rescan(Patterns) end)).
 
 rescan([Pattern|Rest]) ->
@@ -102,6 +108,17 @@ scan_files([], MorePatterns) ->
     rescan(MorePatterns).
 
 
+
+artist_summary() ->
+    {atomic, D} = mnesia:transaction(fun build_artist_summary/0),
+    dict:to_list(D).
+
+build_artist_summary() ->
+    mnesia:foldl(fun(Track, Dict) ->
+                         dict:update(Track#track.artist,
+                                     fun(C) -> C+1 end,
+                                     1, Dict)
+                 end, dict:new(), track).
 
 
 %%--------------------------------------------------------------------

@@ -19,8 +19,8 @@
 
 go() ->
     mnesia:start(),
-    application:start(rubato).
-    %application:start(evo).
+    application:start(rubato),
+    application:start(evo).
 
 setup() ->
     mnesia:create_schema([node()]),
