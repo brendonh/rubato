@@ -87,11 +87,16 @@ rescan([]) ->
     ?DBG(rescan_finished).
 
 scan_files([File|Rest], MorePatterns) ->
-    {Artist, Album, Title, Track} = audinfo:get_info(File),
-    Record = #track{file=list_to_binary(File), 
-                    artist=Artist, album=Album, 
-                    title=Title, track=Track},
-    mnesia:write(Record),
+    case audinfo:get_info(File) of
+        {Artist, Album, Title, Track, Length} ->
+            Record = #track{file=list_to_binary(File), 
+                            artist=Artist, album=Album, 
+                            title=Title, track=Track,
+                            length=Length},
+            mnesia:write(Record);
+        undefined ->
+            ?DBG({skipping, File})
+    end,
     scan_files(Rest, MorePatterns);
 scan_files([], MorePatterns) ->
     rescan(MorePatterns).

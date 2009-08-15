@@ -16,5 +16,6 @@
   artist,
   album,
   title,
-  track
+  track,
+  length
 }).
