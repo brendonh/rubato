@@ -9,8 +9,8 @@ body {
   width: 700px;
   margin: 10px auto 10px auto;
   padding: 10px;
-  border: 1px dotted rgb(255, 240, 62);
-  font-family: Sans;
+  border: 1px solid rgb(255, 240, 62);
+  font-family: Serif;
   background-color: rgb(99, 0, 36);
 }
 
@@ -67,12 +67,12 @@ a:hover { text-decoration: underline; }
 #nav h1 {
   padding: 5px 10px;
   border-right: 1px solid rgb(99, 0, 36);
-  background-color: rgb(255, 240, 62);
+  background-color: rgb(99, 0, 36);
   cursor: pointer;
 }
 
 #nav h1, #nav h1 a {
-  color: rgb(99, 0, 36);
+  color: rgb(255, 186, 20);
 }
 
 #nav a {
