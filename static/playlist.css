@@ -1,11 +1,27 @@
+#boxesTable {
+  border-collapse: separate;
+  border-spacing: 20px;
+}
+
 .listContainer {
-  width: 400px;
-  height: 550px;
-  overflow: auto;
   border: 1px solid rgb(255, 186, 20);
-  padding: 10px;
-  margin: 10px;
   color: white;
+  padding: 10px;
+}
+
+#library {
+  float: left;
+  margin: 0 20px 0 10px;
+  width: 400px;
+  height: 550px; 
+  overflow: auto;
+}
+
+#playlist {
+  width: 200px;
+  height: 550px; 
+  overflow: auto;
+  vertical-align: top;
 }
 
 .folder, .album {
@@ -14,7 +30,6 @@
   color: #666;
   font-size: 11px;
   cursor: pointer;
-  display: none;
 }
 
 .folder {
@@ -47,13 +62,50 @@
   cursor: pointer;
 }
 
+.song .songTrack {
+  color: white;
+  font-size: 12px;
+}
+
 .song .songName {
   font-size: 12px;
   font-weight: bold;
   color: black;
 }
 
+.song .editButton {
+  color: #ff0;
+  font-size: 11px;
+}
+
+.song .editButton:hover {
+  color: white;
+}
+
+
+.entry {
+  margin: 5px;
+  padding: 5px;
+  width: 180px;
+  background-color: rgb(255, 255, 200);
+  color: black;
+  cursor: pointer;
+}
+
+.entry .artist {
+  font-size: 12px;
+  text-align: center;
+  margin-bottom: 3px;
+}
+
+.entry .title {
+  font-size: 13px;
+  font-weight: bold;
+}
+
+
 #songEdit {
+  display: none;
   position: absolute;
   left: 50px;
   top: 50px;
@@ -61,7 +113,6 @@
   border: 1px solid rgb(255, 240, 62);
   background-color: rgb(161, 0, 61);
   padding: 10px;
-  display: none;
 }
 
 #songEdit th {

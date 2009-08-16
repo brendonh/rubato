@@ -1,16 +1,29 @@
 var artistTemplate;
 var albumTemplate;
 var songTemplate;
+var entryTemplate;
+
+var playlist_albums = {};
+var playlist_album_songs = {};
+var playlist_entries = {};
+var entry_id_counter = 0;
 
 var playlist_setup = function() {
     artistTemplate = $("#folderTemplate").removeAttr("id").remove();
     albumTemplate = $("#albumTemplate").removeAttr("id").remove();
     songTemplate = $("#songTemplate").removeAttr("id").remove();
+    entryTemplate = $("#entryTemplate").removeAttr("id").remove();
 
     playlist_reload_library();
+    
+    $("#playlist").sortable({
+        receive: playlist_entry_added,
+    });
 };
 
 var playlist_reload_library = function() {
+    playlist_albums = {};
+    playlist_album_songs = {};
     var library = $("#library");    
     library.html("Loading...");
     $.getJSON("/playlist/summary/artists", {},
@@ -29,10 +42,7 @@ var playlist_reload_library = function() {
               });
 };
 
-var playlist_albums = {};
-
 var playlist_expand_artist = function(artist, box) {
-
     if (!playlist_albums[artist]) {
         box.unbind("click");
         $.getJSON("/playlist/summary/albums", {artist: artist},
@@ -57,7 +67,7 @@ var playlist_expand_artist = function(artist, box) {
 
 
 
-var playlist_insert_albums = function(artist, json) {     
+var playlist_insert_albums = function(artist, json) {    
     var albums = new Array();
     $.each(json, function(album, count) {
         var subBox = albumTemplate.clone().populate({'album': album, 'total': count});
@@ -73,7 +83,6 @@ var playlist_insert_albums = function(artist, json) {
     playlist_albums[artist] = albumBox;
 };
 
-var playlist_album_songs = {};
 
 var playlist_expand_album = function(artist, album, box) {
 
@@ -111,7 +120,13 @@ var playlist_insert_songs = function(artist, album, json) {
     $.each(json['songs'], function(i, song) {
         var subBox = songTemplate.clone().populate(song);
         subBox.css('display', 'block');
-        subBox.dblclick(function() { playlist_edit_song(subBox, song); });
+        subBox.draggable({appendTo: 'body', 
+                          containment: 'document', 
+                          helper: function() { return playlist_make_entry(song); },
+                          connectToSortable: '#playlist'});
+
+        subBox.find(".editButton").click(function() { playlist_edit_song(subBox, song); });
+
         songs.push([song['track'], subBox]);
     });
 
@@ -123,6 +138,12 @@ var playlist_insert_songs = function(artist, album, json) {
     playlist_album_songs[artist][album] = songBox;
 };
 
+
+var playlist_make_entry = function(song) {
+    ph = entryTemplate.clone().populate(song);
+    ph.attr("json", JSON.stringify(song));
+    return ph.get(0);
+};
 
 var playlist_edit_song = function(subBox, song) {
     var popup = $("#songEdit");
@@ -165,4 +186,31 @@ var playlist_edit_complete = function(json) {
     $("#songEdit").css("display", "none");
     playlist_reload_library();
 };
-    
+
+
+
+var playlist_entry_added = function(e, ui) {
+
+    var entryID = "entry_ " + entry_id_counter++;
+
+    var helper = ui.helper.clone();
+    helper.removeAttr("left").removeAttr("top").removeAttr("position");
+
+    var json = JSON.parse(helper.attr("json"));
+
+    playlist_entries[entryID] = json;
+
+    var entry = $("#playlist")
+        .find(".song")
+        .attr("class", "entry ui-draggable")
+        .attr("id", entryID)
+        .html(helper.html());
+
+    var remover = $('<img src="/static/close.png" style="float: right;" />')
+        .click(function() { 
+            entry.remove();
+            delete playlist_entries[entryID];
+        });
+
+    entry.prepend(remover);
+}

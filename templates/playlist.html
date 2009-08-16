@@ -1,55 +1,60 @@
 <div>
 
   <link rel="stylesheet" href="/static/playlist.css" type="text/css"></link>
+  <script src="/static/jquery-ui-1.7.2.custom.min.js"></script>
   <script src="/static/playlist.js"></script>
 
   <script type="text/javascript">
   $(document).ready(playlist_setup);
   </script>
 
-  <div class="listContainer" id="library">
-    Loading...
-  </div>
-  
-  <div class="folder" id="folderTemplate">
-    [+] <span class="artist" j:slot="artist"></span> (<span j:slot="total"></span>)
-  </div>
+  <div class="listContainer" id="library">Loading...</div>
+  <div class="listContainer" id="playlist"></div>
 
-  <div class="album" id="albumTemplate">
-    [+] <span class="albumName" j:slot="album"></span> (<span j:slot="total"></span>)
-  </div>
+    <div class="folder" id="folderTemplate">
+      [+] <span class="artist" j:slot="artist"></span> (<span j:slot="total"></span>)
+    </div>
 
-  <div class="song" id="songTemplate">
-    <span j:slot="track"></span> - <span class="songName" j:slot="title"></span>
-  </div>
+    <div class="album" id="albumTemplate">
+      [+] <span class="albumName" j:slot="album"></span> (<span j:slot="total"></span>)
+    </div>
+    
+    <div class="song" id="songTemplate">
+      <span class="editButton">[?]</span> <span class="songTrack" j:slot="track"></span> - <span class="songName" j:slot="title"></span>
+    </div>
+    
+    <div class="entry" id="entryTemplate">
+      <div class="artist" j:slot="artist"></div> 
+      <div class="title" j:slot="title"></div>
+    </div>
 
-  <div id="songEdit">
-    <table>
-      <tr>
-        <th>Artist: </th>
-        <td><input type="text" name="artist" /></td>
-      </tr>
-      <tr>
-        <th>Album: </th>
-        <td><input type="text" name="album" /></td>
-      </tr>
-      <tr>
-        <th>Title: </th>
-        <td><input type="text" name="title" /></td>
-      </tr>
-      <tr>
-        <th>Track: </th>
-        <td><input type="text" name="track" /></td>
-      </tr>
-      <tr>
-        <th></th>
-        <td>
-          <input type="button" value="Save" /> 
-          <input type="button" value="Cancel" class="cancel" /> 
-        </td>
-      </tr>
-    </table>
-  </div>
+    <div id="songEdit">
+      <table>
+        <tr>
+          <th>Artist: </th>
+          <td><input type="text" name="artist" /></td>
+        </tr>
+        <tr>
+          <th>Album: </th>
+          <td><input type="text" name="album" /></td>
+        </tr>
+        <tr>
+          <th>Title: </th>
+          <td><input type="text" name="title" /></td>
+        </tr>
+        <tr>
+          <th>Track: </th>
+          <td><input type="text" name="track" /></td>
+        </tr>
+        <tr>
+          <th></th>
+          <td>
+            <input type="button" value="Save" /> 
+            <input type="button" value="Cancel" class="cancel" /> 
+          </td>
+        </tr>
+      </table>
+    </div>
 
 </div>
 
