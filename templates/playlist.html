@@ -11,10 +11,12 @@
     Loading...
   </div>
   
-  <div id="folderTemplate">
-    <div class="folder">
-      [+] <span class="artist" j:slot="artist"></span> (<span j:slot="total"></span>)
-    </div>
+  <div class="folder" id="folderTemplate">
+    [+] <span class="artist" j:slot="artist"></span> (<span j:slot="total"></span>)
+  </div>
+
+  <div class="album" id="albumTemplate">
+    [+] <span class="albumName" j:slot="album"></span> (<span j:slot="total"></span>)
   </div>
 
 </div>

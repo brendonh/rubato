@@ -8,14 +8,19 @@
   color: white;
 }
 
-.folder {
-  background-color: rgb(255, 255, 200);
+.folder, .album {
   border: 1px solid black;
-  margin: 5px 0;
   padding: 5px;
   line-break: no-break;
   color: #666;
   font-size: 11px;
+  cursor: pointer;
+  display: none;
+}
+
+.folder {
+  background-color: rgb(255, 255, 200);
+  margin: 5px 0;
 }
 
 .folder .artist {
@@ -24,6 +29,14 @@
   color: black;
 }
 
-#folderTemplate {
-  display: none;
+
+.album {
+  background-color: rgb(255, 186, 20);
+  margin: 5px 0 5px 10px;
+}
+
+.album .albumName {
+  font-size: 14px;
+  font-weight: bold;
+  color: black;
 }

@@ -14,11 +14,10 @@ SOURCES  = $(wildcard $(SRC_DIR)/*.erl)
 INCLUDES = $(wildcard $(INCLUDE_DIR)/*.hrl)
 TARGETS  = $(patsubst $(SRC_DIR)/%.erl, $(EBIN_DIR)/%.beam,$(SOURCES))
 
-SHARED_INCLUDE = ../shared/$(INCLUDE_DIR)
-SHARED_EBIN = ../shared/$(EBIN_DIR)
+QLC_INCLUDE = /usr/local/lib/erlang/lib/stdlib-1.16/include
 EVO_INCLUDE = ../evo/evo/src
 
-ERLC_INCLUDES = -I $(INCLUDE_DIR) -I $(SHARED_INCLUDE) -I $(EVO_INCLUDE)
+ERLC_INCLUDES = -I $(INCLUDE_DIR) -I $(QLC_INCLUDE) -I $(EVO_INCLUDE)
 ERL_EBINS = -pa $(EBIN_DIR) -pa $(EVO_EBIN) -pa $(ID3_EBIN) \
             -pa $(MOCHIWEB_EBIN) -pa $(COUCHDB_EBIN)
 

@@ -39,6 +39,12 @@ respond2(Req, 'GET', ["summary", "artists"], _Conf, _Args) ->
     JSON = mochijson2:encode({struct, Summary}),
     {response, Req:ok({"application/json", JSON})};
 
+respond2(Req, 'GET', ["summary", "albums"], _Conf, _Args) ->
+    QS = mochiweb_request:parse_qs(Req),
+    Artist = list_to_binary(?GV("artist", QS)),
+    AlbumSummary = gen_server:call(rubato_lib, {albumsByArtist, Artist}),
+    JSON = mochijson2:encode({struct, AlbumSummary}),
+    {response, Req:ok({"application/json", JSON})};
 
 respond2(Req, _, _, _, _) ->
     {response, Req:not_found()}.

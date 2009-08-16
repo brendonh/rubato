@@ -17,6 +17,7 @@
          terminate/2, code_change/3]).
 
 -include("rubato.hrl").
+-include("qlc.hrl"). 
 
 -record(state, {}).
 
@@ -49,6 +50,9 @@ init([]) ->
 
 handle_call(artistSummary, _From, State) ->
     {reply, artist_summary(), State};
+
+handle_call({albumsByArtist, Artist}, _From, State) ->
+    {reply, artist_albums(Artist), State};
 
 handle_call(Request, _From, State) ->
     ?DBG({unknown_call, Request}),
@@ -119,6 +123,21 @@ build_artist_summary() ->
                                      fun(C) -> C+1 end,
                                      1, Dict)
                  end, dict:new(), track).
+
+
+artist_albums(Artist) ->
+    {atomic, D} = mnesia:transaction(fun() -> build_artist_albums(Artist) end),
+    dict:to_list(D).
+
+build_artist_albums(Artist) ->
+    Q = qlc:q([T || T <- mnesia:table(track),
+                    T#track.artist == Artist]),
+    lists:foldl(fun(Track, Dict) ->
+                        dict:update(Track#track.album,
+                                    fun(C) -> C+1 end,
+                                    1, Dict)
+                end, dict:new(), qlc:e(Q)).
+                         
 
 
 %%--------------------------------------------------------------------
