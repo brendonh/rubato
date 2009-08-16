@@ -53,15 +53,28 @@ respond2(Req, 'GET', ["summary", "songs"], _Conf, _Args) ->
     Album = list_to_binary(?GV("album", QS)),
     Songs = gen_server:call(rubato_lib, {songsByAlbum, Artist, Album}),
 
-    TrackMaybe = fun(undefined) -> <<"?">>;
+    TrackMaybe = fun(undefined) -> <<"">>;
                     (X) -> X end,
     
-    SongObjects = [{struct, [{name, T#track.title}, 
-                             {track, TrackMaybe(T#track.track)}]}
+    SongObjects = [{struct, [{artist, T#track.artist},
+                             {album, T#track.album},
+                             {title, T#track.title}, 
+                             {track, TrackMaybe(T#track.track)},
+                             {file, T#track.file}]}
                    || T <- Songs],
 
     JSON = mochijson2:encode({struct, [{songs, SongObjects}]}),
     {response, Req:ok({"application/json", JSON})};
+
+respond2(Req, 'POST', ["edit"], _Conf, _Args) ->
+    Form = [{list_to_atom(K), list_to_binary(V)} || {K, V} <- Req:parse_post()],
+    Track = #track{file=?GV(file, Form),
+                   artist=?GV(artist, Form),
+                   album=?GV(album, Form),
+                   title=?GV(title, Form),
+                   track=?GV(track, Form)},
+    gen_server:cast(rubato_lib, {editInfo, Track}),
+    {response, Req:ok({"application/json", "{}"})};
 
 respond2(Req, _, _, _, _) ->
     {response, Req:not_found()}.

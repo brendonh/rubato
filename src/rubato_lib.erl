@@ -67,6 +67,10 @@ handle_cast(rescan, State) ->
     rescan(),
     {noreply, State};
 
+handle_cast({editInfo, Track}, State) ->
+    edit_info(Track),
+    {noreply, State};
+
 handle_cast(Msg, State) ->
     ?DBG({unknown_cast, Msg}),
     {noreply, State}.
@@ -108,7 +112,6 @@ scan_files([File|Rest], MorePatterns) ->
                             length=Length},
             mnesia:write(Record);
         undefined ->
-            %?DBG({skipping, File})
             ok
     end,
     scan_files(Rest, MorePatterns);
@@ -152,6 +155,31 @@ build_album_songs(Artist, Album) ->
                     T#track.artist == Artist,
                     T#track.album == Album]),
     qlc:e(Q).
+
+
+
+edit_info(T) ->
+    L = fun erlang:binary_to_list/1,
+    Cmd = "id3v2 -a \"" ++ L(T#track.artist) ++ "\" -A \"" ++ L(T#track.album)
+        ++ "\" -t \"" ++ L(T#track.title) ++ "\" -T \"" ++ L(T#track.track)
+        ++ "\" \"" ++ L(T#track.file) ++ "\"",
+    os:cmd(Cmd),
+    RV = mnesia:transaction(
+      fun() ->
+              [Orig] = mnesia:read(track, T#track.file),
+              New = T#track{length=Orig#track.length,
+                            track=convert_track_number(T#track.track)},
+              mnesia:write(New)
+      end).
+        
+
+convert_track_number(Track) ->
+    case (catch list_to_integer(binary_to_list(Track))) of
+        X when is_integer(X) -> X;
+        _ -> 0
+    end.
+             
+
 
 %%--------------------------------------------------------------------
 %%% Debug functions

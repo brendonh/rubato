@@ -7,9 +7,14 @@ var playlist_setup = function() {
     albumTemplate = $("#albumTemplate").removeAttr("id").remove();
     songTemplate = $("#songTemplate").removeAttr("id").remove();
 
+    playlist_reload_library();
+};
+
+var playlist_reload_library = function() {
+    var library = $("#library");    
+    library.html("Loading...");
     $.getJSON("/playlist/summary/artists", {},
-              function(json) {
-                  var library = $("#library");
+              function(json) {                  
                   library.html("");
                   var boxes = [];
                   $.each(json, function(artist, count) {
@@ -106,6 +111,7 @@ var playlist_insert_songs = function(artist, album, json) {
     $.each(json['songs'], function(i, song) {
         var subBox = songTemplate.clone().populate(song);
         subBox.css('display', 'block');
+        subBox.dblclick(function() { playlist_edit_song(subBox, song); });
         songs.push([song['track'], subBox]);
     });
 
@@ -116,3 +122,47 @@ var playlist_insert_songs = function(artist, album, json) {
 
     playlist_album_songs[artist][album] = songBox;
 };
+
+
+var playlist_edit_song = function(subBox, song) {
+    var popup = $("#songEdit");
+    var offset = subBox.offset();
+    popup.css("top", offset.top + 5);
+    popup.css("left", offset.left + 5);
+
+    popup.find("[name='artist']").val(song['artist']);
+    popup.find("[name='album']").val(song['album']);
+    popup.find("[name='title']").val(song['title']);
+    popup.find("[name='track']").val(song['track']);
+
+    popup.find("[type='text']").unbind("keydown").keydown(function(e) { 
+        if (e.keyCode == 13) playlist_confirm_edit(song); 
+    });
+
+    popup.find("[value='Cancel']").unbind("click").click(function() { playlist_cancel_edit(); })
+    popup.find("[value='Save']").unbind("click").click(function() { playlist_confirm_edit(song); })
+
+    popup.css("display", "block");
+};
+
+var playlist_cancel_edit = function() {
+    $("#songEdit").css("display", "none");
+};
+
+var playlist_confirm_edit = function(song) {
+    var popup = $("#songEdit");
+    var json = {
+        'file': song['file'],
+        'artist': popup.find("[name='artist']").val(),
+        'album': popup.find("[name='album']").val(),
+        'title': popup.find("[name='title']").val(),
+        'track': popup.find("[name='track']").val()
+    };
+    $.post("/playlist/edit", json, playlist_edit_complete, "json");
+};
+
+var playlist_edit_complete = function(json) { 
+    $("#songEdit").css("display", "none");
+    playlist_reload_library();
+};
+    

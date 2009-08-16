@@ -52,3 +52,34 @@
   font-weight: bold;
   color: black;
 }
+
+#songEdit {
+  position: absolute;
+  left: 50px;
+  top: 50px;
+  z-index: 10;
+  border: 1px solid rgb(255, 240, 62);
+  background-color: rgb(161, 0, 61);
+  padding: 10px;
+  display: none;
+}
+
+#songEdit th {
+  font-weight: normal;
+  text-align: right;
+  padding-right: 5px;
+  padding-bottom: 10px;
+}
+
+#songEdit input[type="text"] {
+  border: 1px solid rgb(255, 186, 20);
+  background-color: #eee;
+}
+
+#songEdit input[type="button"] {
+  width: 70px;
+}
+
+#songEdit input[type="button"].cancel {
+  color: #999;
+}

@@ -20,7 +20,35 @@
   </div>
 
   <div class="song" id="songTemplate">
-    <span j:slot="track"></span> - <span class="songName" j:slot="name"></span>
+    <span j:slot="track"></span> - <span class="songName" j:slot="title"></span>
+  </div>
+
+  <div id="songEdit">
+    <table>
+      <tr>
+        <th>Artist: </th>
+        <td><input type="text" name="artist" /></td>
+      </tr>
+      <tr>
+        <th>Album: </th>
+        <td><input type="text" name="album" /></td>
+      </tr>
+      <tr>
+        <th>Title: </th>
+        <td><input type="text" name="title" /></td>
+      </tr>
+      <tr>
+        <th>Track: </th>
+        <td><input type="text" name="track" /></td>
+      </tr>
+      <tr>
+        <th></th>
+        <td>
+          <input type="button" value="Save" /> 
+          <input type="button" value="Cancel" class="cancel" /> 
+        </td>
+      </tr>
+    </table>
   </div>
 
 </div>
