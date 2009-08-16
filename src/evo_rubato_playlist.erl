@@ -7,7 +7,8 @@
 %%%-------------------------------------------------------------------
 -module(evo_rubato_playlist).
 
--include("evo.hrl").
+%-include("evo.hrl").
+-include("rubato.hrl").
 
 -export([nav/2, respond/5]).
 
@@ -44,6 +45,22 @@ respond2(Req, 'GET', ["summary", "albums"], _Conf, _Args) ->
     Artist = list_to_binary(?GV("artist", QS)),
     AlbumSummary = gen_server:call(rubato_lib, {albumsByArtist, Artist}),
     JSON = mochijson2:encode({struct, AlbumSummary}),
+    {response, Req:ok({"application/json", JSON})};
+
+respond2(Req, 'GET', ["summary", "songs"], _Conf, _Args) ->
+    QS = mochiweb_request:parse_qs(Req),
+    Artist = list_to_binary(?GV("artist", QS)),
+    Album = list_to_binary(?GV("album", QS)),
+    Songs = gen_server:call(rubato_lib, {songsByAlbum, Artist, Album}),
+
+    TrackMaybe = fun(undefined) -> <<"?">>;
+                    (X) -> X end,
+    
+    SongObjects = [{struct, [{name, T#track.title}, 
+                             {track, TrackMaybe(T#track.track)}]}
+                   || T <- Songs],
+
+    JSON = mochijson2:encode({struct, [{songs, SongObjects}]}),
     {response, Req:ok({"application/json", JSON})};
 
 respond2(Req, _, _, _, _) ->

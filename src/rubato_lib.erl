@@ -54,6 +54,9 @@ handle_call(artistSummary, _From, State) ->
 handle_call({albumsByArtist, Artist}, _From, State) ->
     {reply, artist_albums(Artist), State};
 
+handle_call({songsByAlbum, Artist, Album}, _From, State) ->
+    {reply, album_songs(Artist, Album), State};
+
 handle_call(Request, _From, State) ->
     ?DBG({unknown_call, Request}),
     {reply, ok, State}.
@@ -105,7 +108,8 @@ scan_files([File|Rest], MorePatterns) ->
                             length=Length},
             mnesia:write(Record);
         undefined ->
-            ?DBG({skipping, File})
+            %?DBG({skipping, File})
+            ok
     end,
     scan_files(Rest, MorePatterns);
 scan_files([], MorePatterns) ->
@@ -137,8 +141,17 @@ build_artist_albums(Artist) ->
                                     fun(C) -> C+1 end,
                                     1, Dict)
                 end, dict:new(), qlc:e(Q)).
-                         
+ 
 
+album_songs(Artist, Album) ->                        
+    {atomic, Songs} = mnesia:transaction(fun() -> build_album_songs(Artist, Album) end),
+    Songs.
+    
+build_album_songs(Artist, Album) ->
+    Q = qlc:q([T || T <- mnesia:table(track),
+                    T#track.artist == Artist,
+                    T#track.album == Album]),
+    qlc:e(Q).
 
 %%--------------------------------------------------------------------
 %%% Debug functions

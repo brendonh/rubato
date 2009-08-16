@@ -11,7 +11,6 @@
 .folder, .album {
   border: 1px solid black;
   padding: 5px;
-  line-break: no-break;
   color: #666;
   font-size: 11px;
   cursor: pointer;
@@ -37,6 +36,19 @@
 
 .album .albumName {
   font-size: 14px;
+  font-weight: bold;
+  color: black;
+}
+
+.song {
+  background-color: rgb(219, 58, 15);
+  margin: 5px 0 5px 20px;
+  padding: 3px;
+  cursor: pointer;
+}
+
+.song .songName {
+  font-size: 12px;
   font-weight: bold;
   color: black;
 }
