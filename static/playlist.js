@@ -127,12 +127,22 @@ var playlist_insert_songs = function(artist, album, json) {
 
         subBox.find(".editButton").click(function() { playlist_edit_song(subBox, song); });
 
-        songs.push([song['track'], subBox]);
+        songs.push([song['track'], subBox, song]);
     });
 
     songs.sort(function(a, b) { return a[0] - b[0]});
     
-    var songBox = $("<div>").empty();
+    var songBox = $("<div>");
+
+    var addAllBox = $('<div class="song addAll">[Add all songs]</div>')
+        .click(function() {
+            $.each(songs, function(i, bit) {
+                playlist_add_entry(bit[2]);
+            });
+        });
+
+    songBox.append(addAllBox);
+    
     $.each(songs, function(i, s) { songBox.append(s[1]); });
 
     playlist_album_songs[artist][album] = songBox;
@@ -188,29 +198,37 @@ var playlist_edit_complete = function(json) {
 };
 
 
-
 var playlist_entry_added = function(e, ui) {
 
+    playlist_add_entry(JSON.parse(ui.helper.attr("json")), 
+                       $("#playlist").find(".song"),
+                       true);
+    return;
+};
+
+
+var playlist_add_entry = function(song, entry, no_append) {
+    if (!entry) {
+        var entry = $(playlist_make_entry(song));
+    } else {
+        entry.html($(playlist_make_entry(song)).html());
+    }
+
     var entryID = "entry_ " + entry_id_counter++;
-
-    var helper = ui.helper.clone();
-    helper.removeAttr("left").removeAttr("top").removeAttr("position");
-
-    var json = JSON.parse(helper.attr("json"));
-
-    playlist_entries[entryID] = json;
-
-    var entry = $("#playlist")
-        .find(".song")
-        .attr("class", "entry ui-draggable")
-        .attr("id", entryID)
-        .html(helper.html());
-
+    
+    playlist_entries[entryID] = song;
+    
+    entry.attr("class", "entry ui-draggable")
+        .attr("id", entryID);
+    
     var remover = $('<img src="/static/close.png" style="float: right;" />')
         .click(function() { 
             entry.remove();
             delete playlist_entries[entryID];
         });
-
+    
     entry.prepend(remover);
-}
+    
+    if (!no_append) $("#playlist").append(entry);
+    
+};
