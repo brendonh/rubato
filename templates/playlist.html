@@ -3,12 +3,15 @@
   <link rel="stylesheet" href="/static/playlist.css" type="text/css"></link>
   <script src="/static/jquery-ui-1.7.2.custom.min.js"></script>
   <script src="/static/playlist.js"></script>
+  <script src="/static/jquery.amqp.js"></script>
 
   <script type="text/javascript">
   $(document).ready(playlist_setup);
   </script>
 
   <div class="listContainer" id="library">Loading...</div>
+
+  <div class="listContainer" id="current"></div>
   <div class="listContainer" id="playlist"></div>
 
     <div class="folder" id="folderTemplate">

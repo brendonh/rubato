@@ -48,6 +48,22 @@ init([]) ->
 
 
 
+handle_call({trackInfo, File}, _From, State) ->
+    Reply = case mnesia:transaction(
+                   fun() -> mnesia:read(track, File) end) of
+                {atomic, [Track]} -> Track;
+                _ -> #track{}
+            end,
+    {reply, Reply, State};
+
+handle_call({tracksInfo, Files}, _From, State) ->
+    {atomic, Infos} = mnesia:transaction(
+                        fun() -> 
+                                Bits = [mnesia:read(track, F) || F <- Files],
+                                [T || [T] <- Bits]
+                        end),
+    {reply, Infos, State};
+
 handle_call(artistSummary, _From, State) ->
     {reply, artist_summary(), State};
 

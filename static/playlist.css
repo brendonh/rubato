@@ -17,11 +17,17 @@
   overflow: auto;
 }
 
+#current {
+  width: 220px;
+  height: 50px;
+  overflow: auto;
+  margin-bottom: 20px;
+}
+
 #playlist {
   width: 220px;
-  height: 550px; 
+  height: 460px; 
   overflow: auto;
-  vertical-align: top;
 }
 
 .folder, .album {
@@ -100,6 +106,10 @@
   background-color: rgb(255, 255, 200);
   color: black;
   cursor: pointer;
+}
+
+#current > .entry {
+  width: 200px;
 }
 
 .entry .artist {

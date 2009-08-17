@@ -29,7 +29,9 @@ start_link() ->
 init([]) ->
     Library = {library,{rubato_lib,start_link,[]},
                permanent,2000,worker,[rubato_lib]},
-    {ok,{{one_for_one,1,1}, [Library]}}.
+    Playlist = {playlist,{rubato_playlist,start_link,[]},
+               permanent,2000,worker,[rubato_playlist]},
+    {ok,{{one_for_one,1,1}, [Library, Playlist]}}.
 
 %%====================================================================
 %% Internal functions

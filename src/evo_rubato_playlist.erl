@@ -35,6 +35,24 @@ respond2(_Req, 'GET', [], _Conf, _Args) ->
     {wrap, site, [{content, Content}, {title, "Playlist"}]};
 
 
+respond2(Req, 'GET', ["playlist"], _Conf, _Args) ->
+    {Current, Playlist} = gen_server:call(rubato_playlist, status),
+    
+    MakeTrack = fun(T) -> {struct, [{file, T#track.file}, {artist, T#track.artist},
+                                    {album, T#track.album}, {title, T#track.title},
+                                    {track, T#track.track}]} end,
+
+    Current2 = case Current of
+                   none -> {struct, []};
+                   _ -> MakeTrack(Current)
+               end,
+    
+    Playlist2 = [MakeTrack(T) || T <- gen_server:call(rubato_lib, {tracksInfo, Playlist})],
+    
+    JSON = mochijson2:encode({struct, [{current, Current2}, {playlist, Playlist2}]}),
+
+    {response, Req:ok({"application/json", JSON})};
+     
 respond2(Req, 'GET', ["summary", "artists"], _Conf, _Args) ->
     Summary = gen_server:call(rubato_lib, artistSummary),
     JSON = mochijson2:encode({struct, Summary}),
@@ -74,6 +92,13 @@ respond2(Req, 'POST', ["edit"], _Conf, _Args) ->
                    title=?GV(title, Form),
                    track=?GV(track, Form)},
     gen_server:cast(rubato_lib, {editInfo, Track}),
+    {response, Req:ok({"application/json", "{}"})};
+
+
+respond2(Req, 'POST', ["update"], _Conf, _Args) ->
+    Form = Req:parse_post(),
+    Files = mochijson2:decode(?GV("files", Form)),
+    gen_server:cast(rubato_playlist, {update, Files}),
     {response, Req:ok({"application/json", "{}"})};
 
 respond2(Req, _, _, _, _) ->

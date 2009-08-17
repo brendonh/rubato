@@ -1,3 +1,5 @@
+var update_delay = 2000;
+
 var artistTemplate;
 var albumTemplate;
 var songTemplate;
@@ -7,6 +9,7 @@ var playlist_albums = {};
 var playlist_album_songs = {};
 var playlist_entries = {};
 var entry_id_counter = 0;
+var update_timeout;
 
 var playlist_setup = function() {
     artistTemplate = $("#folderTemplate").removeAttr("id").remove();
@@ -14,12 +17,57 @@ var playlist_setup = function() {
     songTemplate = $("#songTemplate").removeAttr("id").remove();
     entryTemplate = $("#entryTemplate").removeAttr("id").remove();
 
+    playlist_get_status();
+
     playlist_reload_library();
     
     $("#playlist").sortable({
         receive: playlist_entry_added,
+        update: playlist_update,
     });
+
+    $.amqp.init("/amqp", function() {
+        $.amqp("playing", function(key, payload) {
+            var json = JSON.parse(payload);
+            if (!json['file']) {
+                json['artist'] = 'None';
+                json['title'] = '[Silence]';
+            }
+            entry = playlist_make_entry(json);
+            $("#current").empty().append(entry);
+
+            var topmost = $($("#playlist").find(".entry").get(0));
+            var topjson = JSON.parse(topmost.attr("json"));
+            if (topjson['file'] == json['file']) {
+                delete playlist_entries[topmost.attr("id")];
+                topmost.remove();
+            }
+
+        });
+    });
+               
+
 };
+
+
+var playlist_get_status = function() {
+    $.getJSON("/playlist/playlist", {},
+              function(json) {
+                  var current = json['current'];
+                  var playlist = json['playlist'];
+                  if (!current['file']) {
+                      current['artist'] = 'None';
+                      current['title'] = '[Silence]';
+                  }
+                  entry = playlist_make_entry(current);
+                  $("#current").empty().append(entry);
+
+                  $.each(playlist, function(i, song) {
+                      playlist_add_entry(song);
+                  });
+              });
+};
+
 
 var playlist_reload_library = function() {
     playlist_albums = {};
@@ -96,9 +144,9 @@ var playlist_expand_album = function(artist, album, box) {
         $.getJSON("/playlist/summary/songs", {artist: artist, album: album},
                   function(json) { 
                       playlist_insert_songs(artist, album, json);
-                      playlist_expand_album(artist, album, box);
                       box.after(playlist_album_songs[artist][album]);
                       box.click(function() { playlist_expand_album(artist, album, box); });
+                      playlist_expand_album(artist, album, box);
                   });
         return;
     }
@@ -124,10 +172,11 @@ var playlist_insert_songs = function(artist, album, json) {
                           containment: 'document', 
                           helper: function() { return playlist_make_entry(song); },
                           connectToSortable: '#playlist'});
-
+        
         subBox.find(".editButton").click(function() { playlist_edit_song(subBox, song); });
-
+        
         songs.push([song['track'], subBox, song]);
+
     });
 
     songs.sort(function(a, b) { return a[0] - b[0]});
@@ -139,6 +188,7 @@ var playlist_insert_songs = function(artist, album, json) {
             $.each(songs, function(i, bit) {
                 playlist_add_entry(bit[2]);
             });
+            playlist_update();
         });
 
     songBox.append(addAllBox);
@@ -147,6 +197,9 @@ var playlist_insert_songs = function(artist, album, json) {
 
     playlist_album_songs[artist][album] = songBox;
 };
+
+var playlist_add_entry_what = function(song) {
+}
 
 
 var playlist_make_entry = function(song) {
@@ -199,11 +252,9 @@ var playlist_edit_complete = function(json) {
 
 
 var playlist_entry_added = function(e, ui) {
-
     playlist_add_entry(JSON.parse(ui.helper.attr("json")), 
                        $("#playlist").find(".song"),
                        true);
-    return;
 };
 
 
@@ -225,10 +276,27 @@ var playlist_add_entry = function(song, entry, no_append) {
         .click(function() { 
             entry.remove();
             delete playlist_entries[entryID];
+            playlist_update();
         });
     
     entry.prepend(remover);
     
     if (!no_append) $("#playlist").append(entry);
     
+};
+
+
+var playlist_update = function() {
+    if (update_timeout) clearTimeout(update_timeout);
+    update_timeout = setTimeout("playlist_send()", update_delay);
+}
+
+
+var playlist_send = function() {
+    var files = [];
+    $.each($("#playlist").sortable('toArray'), function(i, eid) {
+        files.push(playlist_entries[eid]['file']);
+    });
+    $.post("/playlist/update", {files: JSON.stringify(files)},
+           function(json) {}, "json");
 };
