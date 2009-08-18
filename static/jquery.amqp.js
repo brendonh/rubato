@@ -36,7 +36,14 @@
     $.amqp.messages = function(json) {
         $.each(json, function(i, obj) {
             var callback = $.amqp.callbacks[obj.key];
-            if (callback) callback(obj.key, obj.payload);
+            if (callback) {
+                try {callback(obj.key, obj.payload); }
+                catch (e) { 
+                    if (console && console.debug) {
+                        console.debug("Oh noes: " + e);
+                    }
+                }
+            }
         });
         $.amqp.poll();
     };

@@ -4,6 +4,7 @@ var artistTemplate;
 var albumTemplate;
 var songTemplate;
 var entryTemplate;
+var infoTemplate;
 
 var playlist_albums = {};
 var playlist_album_songs = {};
@@ -16,6 +17,7 @@ var playlist_setup = function() {
     albumTemplate = $("#albumTemplate").removeAttr("id").remove();
     songTemplate = $("#songTemplate").removeAttr("id").remove();
     entryTemplate = $("#entryTemplate").removeAttr("id").remove();
+    infoTemplate = $("#infoTemplate").removeAttr("id").remove();
 
     playlist_get_status();
 
@@ -26,21 +28,30 @@ var playlist_setup = function() {
         update: playlist_update,
     });
 
+    $("#forceSkip").click(function() { $.post("/playlist/skip"); });
+
     $.amqp.init("/amqp", function() {
         $.amqp("playing", function(key, payload) {
             var json = JSON.parse(payload);
+            
             if (!json['file']) {
                 json['artist'] = 'None';
                 json['title'] = '[Silence]';
             }
-            entry = playlist_make_entry(json);
-            $("#current").empty().append(entry);
+            
+            console.debug("Repopulating");
+            $("#currentInfo").html(infoTemplate.clone().populate(json).html());
 
-            var topmost = $($("#playlist").find(".entry").get(0));
-            var topjson = JSON.parse(topmost.attr("json"));
-            if (topjson['file'] == json['file']) {
-                delete playlist_entries[topmost.attr("id")];
-                topmost.remove();
+            var entries = $("#playlist").find(".entry");
+
+            if (entries.length) {
+                var topmost = $(entries.get(0));
+                var topjson = JSON.parse(topmost.attr("json"));
+
+                if (topjson['file'] == json['file']) {
+                    delete playlist_entries[topmost.attr("id")];
+                    topmost.remove();
+                }
             }
 
         });
@@ -59,8 +70,8 @@ var playlist_get_status = function() {
                       current['artist'] = 'None';
                       current['title'] = '[Silence]';
                   }
-                  entry = playlist_make_entry(current);
-                  $("#current").empty().append(entry);
+
+                  $("#currentInfo").html(infoTemplate.clone().populate(current).html());
 
                   $.each(playlist, function(i, song) {
                       playlist_add_entry(song);
@@ -198,10 +209,6 @@ var playlist_insert_songs = function(artist, album, json) {
     playlist_album_songs[artist][album] = songBox;
 };
 
-var playlist_add_entry_what = function(song) {
-}
-
-
 var playlist_make_entry = function(song) {
     ph = entryTemplate.clone().populate(song);
     ph.attr("json", JSON.stringify(song));
@@ -262,7 +269,9 @@ var playlist_add_entry = function(song, entry, no_append) {
     if (!entry) {
         var entry = $(playlist_make_entry(song));
     } else {
-        entry.html($(playlist_make_entry(song)).html());
+        var sourceEntry = $(playlist_make_entry(song));
+        entry.html(sourceEntry.html());
+        entry.attr("json", sourceEntry.attr("json"));
     }
 
     var entryID = "entry_ " + entry_id_counter++;
@@ -288,6 +297,7 @@ var playlist_add_entry = function(song, entry, no_append) {
 
 var playlist_update = function() {
     if (update_timeout) clearTimeout(update_timeout);
+    $("#playlist").css("border-color", "#f00");
     update_timeout = setTimeout("playlist_send()", update_delay);
 }
 
@@ -298,5 +308,7 @@ var playlist_send = function() {
         files.push(playlist_entries[eid]['file']);
     });
     $.post("/playlist/update", {files: JSON.stringify(files)},
-           function(json) {}, "json");
+           function(json) {
+               $("#playlist").css("border-color", "rgb(255, 186, 20)");
+           }, "json");
 };

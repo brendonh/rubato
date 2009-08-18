@@ -9,9 +9,20 @@
   $(document).ready(playlist_setup);
   </script>
 
+  <div class="listContainer" id="current">
+    <table>
+      <tr>
+        <td width="600" id="currentInfo">
+        </td>
+        <td>
+          <input type="button" value="Force Skip" id="forceSkip" />
+        </td>
+      </tr>
+    </table>
+  </div>
+
   <div class="listContainer" id="library">Loading...</div>
 
-  <div class="listContainer" id="current"></div>
   <div class="listContainer" id="playlist"></div>
 
     <div class="folder" id="folderTemplate">
@@ -29,6 +40,11 @@
     <div class="entry" id="entryTemplate">
       <div class="artist" j:slot="artist"></div> 
       <div class="title" j:slot="title"></div>
+    </div>
+
+    <div id="infoTemplate">
+      <h1 j:slot="title"></h1>
+      <span j:slot="artist"></span>
     </div>
 
     <div id="songEdit">

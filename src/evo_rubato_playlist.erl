@@ -101,6 +101,12 @@ respond2(Req, 'POST', ["update"], _Conf, _Args) ->
     gen_server:cast(rubato_playlist, {update, Files}),
     {response, Req:ok({"application/json", "{}"})};
 
+
+respond2(Req, 'POST', ["skip"], _Conf, _Args) ->
+    %% Hah hah do this better
+    os:cmd("echo '/.skip' | nc -t -w1 localhost 1234"),
+    {response, Req:ok({"application/json", "{}"})};
+
 respond2(Req, _, _, _, _) ->
     {response, Req:not_found()}.
 
